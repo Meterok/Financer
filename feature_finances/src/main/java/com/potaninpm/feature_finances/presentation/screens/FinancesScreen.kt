@@ -133,7 +133,7 @@ private fun FinancesScreenContent(
     var actionType by remember { mutableStateOf<String?>(null) }
 
     val monthsToAchieve = if (averageMonthlyInflow == 0.0) -1.0 else (totalTarget - totalSavings) / averageMonthlyInflow
-    val overallProgress = totalSavings.toFloat() / totalTarget.toFloat()
+    val overallProgress = if (totalTarget > 0) totalSavings.toFloat() / totalTarget.toFloat() else 0f
 
     if (fromGoal != null && actionType != null) {
         when (actionType) {

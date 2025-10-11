@@ -1,6 +1,7 @@
 package com.potaninpm.feature_home.data.repository
 
 import android.content.SharedPreferences
+import android.util.Log
 import com.potaninpm.feature_home.data.local.dao.NewsArticleDao
 import com.potaninpm.feature_home.data.mappers.toDomainNews
 import com.potaninpm.feature_home.data.mappers.toEntity
@@ -29,12 +30,17 @@ class NewsRepositoryImpl(
                 dto.toDomainNews()
             }
 
+            Log.d("INFOG", articles.toString())
+            Log.d("INFOG", response.toString())
+
             newsArticleDao.clearNews()
             newsArticleDao.insertAll(articles.map { it.toEntity(currentTime) })
             prefs.edit().putLong(LAST_UPDATE_KEY, currentTime).apply()
             articles
         } catch (e: Exception) {
             e.printStackTrace()
+
+            Log.d("INFOG", e.toString())
             val lastUpdateTime = prefs.getLong(LAST_UPDATE_KEY, 0L)
             if (currentTime - lastUpdateTime < SIX_HOURS) {
                 val cachedNews = newsArticleDao.getAllNews()

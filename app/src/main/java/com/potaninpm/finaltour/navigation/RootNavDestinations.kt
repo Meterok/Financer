@@ -3,6 +3,8 @@ package com.potaninpm.finaltour.navigation
 sealed class RootNavDestinations(val route: String) {
     data object Home : RootNavDestinations("home")
 
+    data object Auth : RootNavDestinations("auth")
+
     data object Search : RootNavDestinations("search")
 
     data object Finances : RootNavDestinations("finances")

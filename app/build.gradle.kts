@@ -17,6 +17,8 @@ android {
         versionCode = 1
         versionName = "1.0"
 
+        manifestPlaceholders["YANDEX_CLIENT_ID"] = "bf1b701f17c94b89ace0abc5e27d9608"
+
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -53,6 +55,11 @@ dependencies {
     implementation(project(":feature_home"))
     implementation(project(":feature_finances"))
     implementation(project(":feature_feed"))
+    implementation(project(":feature_auth"))
+
+    api(platform(libs.koin.bom))
+    api(libs.koin.androidx.compose)
+    api(libs.koin.androidx.compose.navigation)
 
     // Room
     ksp(libs.androidx.room.compiler)

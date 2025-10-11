@@ -42,6 +42,10 @@ android {
 dependencies {
     implementation(project(":common"))
 
+    api(platform(libs.koin.bom))
+    api(libs.koin.androidx.compose)
+    api(libs.koin.androidx.compose.navigation)
+
     // Room
     ksp(libs.androidx.room.compiler)
     api(libs.androidx.room.runtime)

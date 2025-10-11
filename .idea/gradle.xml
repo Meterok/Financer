@@ -12,12 +12,12 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/app" />
             <option value="$PROJECT_DIR$/common" />
+            <option value="$PROJECT_DIR$/feature_auth" />
             <option value="$PROJECT_DIR$/feature_feed" />
             <option value="$PROJECT_DIR$/feature_finances" />
             <option value="$PROJECT_DIR$/feature_home" />
           </set>
         </option>
-        <option name="resolveExternalAnnotations" value="false" />
       </GradleProjectSettings>
     </option>
   </component>

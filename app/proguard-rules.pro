@@ -22,3 +22,25 @@
 
 -keep class com.potaninpm.feature_home.data.remote.dto.** { *; }
 -keep class com.potaninpm.feature_home.domain.model.** { *; }
+
+# Koin specific rules for Compose and ViewModel
+-keep class org.koin.androidx.viewmodel.ext.android.ViewModelOwnerKt
+-keep class org.koin.androidx.compose.CompatViewModelComposeKt
+
+# Keep rules for Kotlin reflection
+-keepnames class * implements java.io.Serializable
+-keepclassmembers class * implements java.io.Serializable {
+    static final long serialVersionUID;
+    private static final java.io.ObjectStreamField[] serialPersistentFields;
+    private void writeObject(java.io.ObjectOutputStream);
+    private void readObject(java.io.ObjectInputStream);
+    private void readObjectNoData();
+    private java.lang.Object writeReplace();
+    private java.lang.Object readResolve();
+}
+
+# Keep AuthViewModel and its dependencies for Koin
+-keep class com.potaninpm.feature_auth.presentation.viewModels.** { *; }
+
+# This is generated automatically by the Android Gradle plugin.
+-dontwarn kotlinx.parcelize.Parcelize

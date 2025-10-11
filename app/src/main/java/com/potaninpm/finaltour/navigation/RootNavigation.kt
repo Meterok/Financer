@@ -16,6 +16,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.potaninpm.core.ui.screens.ArticleWebView
+import com.potaninpm.feature_auth.presentation.screens.WelcomeScreen
 import com.potaninpm.feature_feed.presentation.screens.CreatePostScreen
 import com.potaninpm.feature_feed.presentation.screens.FeedScreen
 import com.potaninpm.feature_finances.presentation.screens.FinancesScreen
@@ -70,12 +71,21 @@ fun RootNavigation() {
     ) { innerPadding ->
         NavHost(
             navController = rootNavController,
-            startDestination = RootNavDestinations.Home.route,
+            startDestination = RootNavDestinations.Auth.route,
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None }
         ) {
+
+            composable(RootNavDestinations.Auth.route) {
+                WelcomeScreen(
+                    onAuthSuccess = {
+                        rootNavController.navigate(RootNavDestinations.Home.route)
+                    }
+                )
+            }
+
             composable(RootNavDestinations.Home.route) {
                 HomeScreen(
                     rootNavController = rootNavController,

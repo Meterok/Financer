@@ -7,7 +7,7 @@ data class NYTimesArticleDto(
     @SerializedName("headline") val headline: HeadlineDto,
     @SerializedName("abstract") val abstract: String?,
     @SerializedName("web_url") val webUrl: String,
-    @SerializedName("multimedia") val multimedia: List<MultimediaDto>?,
+    @SerializedName("multimedia") val multimedia: MultimediaDto?,
     @SerializedName("source") val source: String,
     @SerializedName("pub_date") val pubDate: String
 )
