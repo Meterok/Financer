@@ -98,4 +98,5 @@
     <string name="enter_as_admin">Войти как администратор</string>
     <string name="edit">Редактировать</string>
     <string name="no_server">No server connection</string>
+    <string name="test_login">Тестовый вход</string>
 </resources>

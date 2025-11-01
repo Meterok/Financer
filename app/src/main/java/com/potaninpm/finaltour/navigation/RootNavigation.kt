@@ -25,6 +25,7 @@ import com.potaninpm.feature_home.presentation.screens.SearchScreen
 import com.potaninpm.finaltour.R
 import com.potaninpm.finaltour.navigation.bottomNav.BottomNavBar
 import com.potaninpm.finaltour.navigation.bottomNav.BottomNavItem
+import com.potaninpm.finaltour.screens.HelpScreen
 import java.net.URLDecoder
 
 @Composable
@@ -37,7 +38,8 @@ fun RootNavigation() {
     val routesWithBottomBar = listOf(
         RootNavDestinations.Home.route,
         RootNavDestinations.Finances.route,
-        RootNavDestinations.Feed.route
+        RootNavDestinations.Feed.route,
+        RootNavDestinations.Help.route
     )
 
     Scaffold(
@@ -63,6 +65,12 @@ fun RootNavigation() {
                             labelRes = R.string.posts,
                             selectedIcon = ImageVector.vectorResource(id = R.drawable.newspaper_24px_filled),
                             unselectedIcon = ImageVector.vectorResource(id = R.drawable.newspaper_24px_not_filled)
+                        ),
+                        BottomNavItem(
+                            route = RootNavDestinations.Help,
+                            labelRes = R.string.help,
+                            selectedIcon = ImageVector.vectorResource(id = R.drawable.help_24px_filled),
+                            unselectedIcon = ImageVector.vectorResource(id = R.drawable.help_24px_not_filled)
                         )
                     )
                 )
@@ -105,6 +113,13 @@ fun RootNavigation() {
 
             composable(RootNavDestinations.Feed.route) {
                 FeedScreen(rootNavController)
+            }
+
+            composable(RootNavDestinations.Help.route) {
+                HelpScreen(
+                    modifier = Modifier
+                        .padding(innerPadding)
+                )
             }
 
             composable(

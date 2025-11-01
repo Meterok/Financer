@@ -4,4 +4,6 @@
     <string name="home">Home</string>
     <string name="finances">Finances</string>
     <string name="posts">Posts</string>
+    <string name="help">Помощь</string>
+    <string name="test_login">Тестовый вход</string>
 </resources>

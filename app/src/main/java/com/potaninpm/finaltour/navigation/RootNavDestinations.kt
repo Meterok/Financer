@@ -11,6 +11,8 @@ sealed class RootNavDestinations(val route: String) {
 
     data object Feed : RootNavDestinations("feed")
 
+    data object Help : RootNavDestinations("help")
+
     data object CreatePost : RootNavDestinations("create_post")
 
     data object ArticleWebView : RootNavDestinations("article_web_view")
