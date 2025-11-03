@@ -1,6 +1,7 @@
 package com.potaninpm.finaltour.di.modules
 
 import com.potaninpm.core.ApiConstants
+import com.potaninpm.feature_finances.data.remote.api.FinancesApi
 import com.potaninpm.feature_home.data.remote.api.FinnhubApi
 import com.potaninpm.feature_home.data.remote.api.NYTimesApi
 import com.potaninpm.feature_home.data.remote.api.SupabaseTickersApi
@@ -65,4 +66,16 @@ val postsNetworkModule = module {
     }
 
     single<SupabaseTickersApi> { get<Retrofit>().create(SupabaseTickersApi::class.java) }
+}
+
+val financesNetworkModule = module {
+    // Использует тот же OkHttpClient с Auth интерцептором из authModule
+    single<FinancesApi> {
+        Retrofit.Builder()
+            .baseUrl(ApiConstants.BASE_URL)
+            .client(get<OkHttpClient>()) // OkHttpClient с AuthInterceptor
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(FinancesApi::class.java)
+    }
 }

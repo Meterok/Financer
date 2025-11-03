@@ -30,28 +30,12 @@ class AuthRepositoryImpl (
 ) : AuthRepository {
     override suspend fun register(email: String, password: String, fullName: String, avatarUri: Uri?): Boolean {
         return try {
-            val avatarUrl = avatarUri?.let {
-                try {
-                    loadImage(it)
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error uploading avatar", e)
-                    null
-                }
-            }
-
-            api.register(
-                RegisterRequestDto(
-                    email = email,
-                    fullName = fullName,
-                    password = password,
-                    avatarUrl = avatarUrl
-                )
-            )
-
+            // Регистрация пользователя
+            api.register(RegisterRequestDto(email = email, password = password))
+            
+            // Автоматический вход после регистрации
             val loginResponse = api.login(LoginRequestDto(email, password))
             val result = handleAuthResponse(loginResponse)
-
-            trySendDeviceToken("registration")
 
             result
         } catch (e: Exception) {
@@ -65,8 +49,6 @@ class AuthRepositoryImpl (
             val response = api.login(LoginRequestDto(email, password))
             val result = handleAuthResponse(response)
 
-            trySendDeviceToken("login")
-
             result
         } catch (e: Exception) {
             Log.e(TAG, "Login failed", e)
@@ -79,26 +61,11 @@ class AuthRepositoryImpl (
             val response = api.signInWithYandex(YandexToken(token))
             val result = handleAuthResponse(response)
 
-            trySendDeviceToken("Yandex sign-in")
-
             result
         } catch (e: Exception) {
             Log.e(TAG, "Yandex sign-in failed", e)
             false
         }
-    }
-
-    private suspend fun trySendDeviceToken(operation: String) {
-        try {
-            sendDeviceToken()
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to send device token after $operation", e)
-        }
-    }
-
-    override suspend fun sendDeviceToken() {
-        val token = getFcmToken()
-        api.sendDeviceToken(NotificationsRequestDto(token, "android"))
     }
 
     override fun getFcmToken(): String {

@@ -19,3 +19,7 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# Keep DTO classes for Retrofit/Gson
+-keep class com.potaninpm.feature_auth.data.remote.dto.** { *; }
+-keepclassmembers class com.potaninpm.feature_auth.data.remote.dto.** { *; }

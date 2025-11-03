@@ -9,7 +9,7 @@
     <string name="phone_number">Номер телефона</string>
     <string name="email">Электронная почта</string>
     <string name="password">Пароль</string>
-    <string name="password_must_be_at_least_4_characters">Пароль должен содержать минимум 4 символа</string>
+    <string name="password_must_be_at_least_8_characters">Пароль должен содержать минимум 8 символов</string>
     <string name="password_cannot_be_empty">Пароль не может быть пустым</string>
     <string name="invalid_data">Данные не верны</string>
     <string name="smth_went_wrong">Что-то пошло не так. Попробуйте позже</string>
@@ -99,4 +99,12 @@
     <string name="edit">Редактировать</string>
     <string name="no_server">No server connection</string>
     <string name="test_login">Тестовый вход</string>
+    <string name="no_account_register">Нет аккаунта? Зарегистрируйся</string>
+    <string name="have_account_login">Уже есть аккаунт? Войти</string>
+    <string name="create_account">Создать аккаунт</string>
+    <string name="create_account_subtitle">Заполните данные для регистрации</string>
+    <string name="error_invalid_credentials">Неверный email или пароль</string>
+    <string name="error_user_exists">Пользователь с таким email уже существует</string>
+    <string name="error_network">Ошибка сети. Проверьте подключение</string>
+    <string name="error_unknown">Произошла ошибка. Попробуйте позже</string>
 </resources>

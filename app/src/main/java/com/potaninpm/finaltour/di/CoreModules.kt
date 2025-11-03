@@ -2,6 +2,7 @@ package com.potaninpm.finaltour.di
 
 import com.potaninpm.feature_auth.di.authModule
 import com.potaninpm.finaltour.di.modules.chatModule
+import com.potaninpm.finaltour.di.modules.financesNetworkModule
 import com.potaninpm.finaltour.di.modules.financesRepositoryModule
 import com.potaninpm.finaltour.di.modules.financeRoomModule
 import com.potaninpm.finaltour.di.modules.financesViewModelModule
@@ -17,6 +18,7 @@ import com.potaninpm.finaltour.di.modules.postsViewModelModule
 val coreModules = listOf(
     homeNetworkModule,
     postsNetworkModule,
+    financesNetworkModule,
     authModule,
 
     financeRoomModule,

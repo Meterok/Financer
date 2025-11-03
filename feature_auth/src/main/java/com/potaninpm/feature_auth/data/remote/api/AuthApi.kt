@@ -13,8 +13,8 @@ import retrofit2.http.POST
 import retrofit2.http.Part
 
 interface AuthApi {
-    @POST("users")
-    suspend fun register(@Body request: RegisterRequestDto)
+    @POST("register")
+    suspend fun register(@Body request: RegisterRequestDto): com.potaninpm.feature_auth.data.remote.dto.RegisterResponseDto
 
     @Multipart
     @POST("storage/upload")
@@ -22,7 +22,7 @@ interface AuthApi {
         @Part file: MultipartBody.Part
     ): FileUploadResponse
 
-    @POST("auth/login")
+    @POST("login")
     suspend fun login(@Body request: LoginRequestDto): AuthResponse
 
     @POST("auth/login/yandex")

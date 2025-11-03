@@ -46,6 +46,7 @@ dependencies {
     // Retrofit
     api(libs.retrofit)
     api(libs.converter.gson)
+    api(libs.okhttp.logging.interceptor)
 
     // Room
     ksp(libs.androidx.room.compiler)

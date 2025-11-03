@@ -5,6 +5,8 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -17,6 +19,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.potaninpm.core.ui.screens.ArticleWebView
 import com.potaninpm.feature_auth.presentation.screens.WelcomeScreen
+import com.potaninpm.feature_auth.presentation.state.AuthState
+import com.potaninpm.feature_auth.presentation.viewModels.AuthViewModel
 import com.potaninpm.feature_feed.presentation.screens.CreatePostScreen
 import com.potaninpm.feature_feed.presentation.screens.FeedScreen
 import com.potaninpm.feature_finances.presentation.screens.FinancesScreen
@@ -26,11 +30,14 @@ import com.potaninpm.finaltour.R
 import com.potaninpm.finaltour.navigation.bottomNav.BottomNavBar
 import com.potaninpm.finaltour.navigation.bottomNav.BottomNavItem
 import com.potaninpm.finaltour.screens.HelpScreen
+import org.koin.androidx.compose.koinViewModel
 import java.net.URLDecoder
 
 @Composable
 fun RootNavigation() {
     val rootNavController = rememberNavController()
+    val authViewModel: AuthViewModel = koinViewModel()
+    val authState by authViewModel.authState.collectAsState()
 
     val navBackStackEntry by rootNavController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route

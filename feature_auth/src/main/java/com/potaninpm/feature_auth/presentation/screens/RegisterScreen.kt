@@ -224,7 +224,7 @@ fun RegisterScreenContent(
                         password = it
                         passwordError = when {
                             it.isEmpty() -> context.getString(R.string.password_cannot_be_empty)
-                            it.length < 4 -> context.getString(R.string.password_must_be_at_least_4_characters)
+                            it.length < 4 -> "Пароль должен быть хотя бы 4 символа"
                             else -> null
                         }
                     },

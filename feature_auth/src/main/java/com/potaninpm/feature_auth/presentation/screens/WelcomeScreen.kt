@@ -15,12 +15,16 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -53,6 +57,7 @@ fun WelcomeScreen(
     val authViewModel: AuthViewModel = koinViewModel()
     val authState by authViewModel.authState.collectAsState()
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val yandexSdk = YandexAuthSdk.create(YandexAuthOptions(context))
     val yandexAuthLauncher = rememberLauncherForActivityResult(contract = yandexSdk.contract) { result ->
@@ -64,6 +69,13 @@ fun WelcomeScreen(
     val onSignInWithYandexClick: () -> Unit = {
         val loginOptions = YandexAuthLoginOptions()
         yandexAuthLauncher.launch(loginOptions)
+    }
+
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Error) {
+            val errorMessage = (authState as AuthState.Error).message
+            snackbarHostState.showSnackbar(errorMessage)
+        }
     }
 
     when (authState) {
@@ -80,10 +92,14 @@ fun WelcomeScreen(
         }
         else -> {
             WelcomeScreenContent(
-                onTestLoginClick = { email, password ->
-                    authViewModel.testLogin(email, password)
+                snackbarHostState = snackbarHostState,
+                onSignInWithYandexClick = onSignInWithYandexClick,
+                onLoginClick = { email, password ->
+                    authViewModel.login(email, password)
                 },
-                onSignInWithYandexClick = onSignInWithYandexClick
+                onRegisterClick = { email, password ->
+                    authViewModel.register(email, password, "", null)
+                }
             )
         }
     }
@@ -91,18 +107,33 @@ fun WelcomeScreen(
 
 @Composable
 private fun WelcomeScreenContent(
-    onTestLoginClick: (email: String, password: String) -> Unit = { _, _ -> },
-    onSignInWithYandexClick: () -> Unit = {}
+    snackbarHostState: SnackbarHostState,
+    onSignInWithYandexClick: () -> Unit = {},
+    onLoginClick: (email: String, password: String) -> Unit = { _, _ -> },
+    onRegisterClick: (email: String, password: String) -> Unit = { _, _ -> }
 ) {
+    var isLoginMode by rememberSaveable { mutableStateOf(true) }
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
 
-    val isButtonEnabled = email.isNotEmpty() && password.isNotEmpty()
+    val context = LocalContext.current
+    var emailError by rememberSaveable { mutableStateOf<String?>(null) }
+    var passwordError by rememberSaveable { mutableStateOf<String?>(null) }
+
+    val isButtonEnabled = email.isNotEmpty() && password.isNotEmpty() &&
+            emailError == null && passwordError == null
 
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(16.dp)
+            )
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -130,7 +161,8 @@ private fun WelcomeScreenContent(
                     Spacer(modifier = Modifier.height(24.dp))
 
                     Text(
-                        text = stringResource(R.string.welcome_back),
+                        text = if (isLoginMode) stringResource(R.string.welcome_back) 
+                               else stringResource(R.string.create_account),
                         style = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Medium
                     )
@@ -138,7 +170,8 @@ private fun WelcomeScreenContent(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Введите любые данные для входа в тестовом режиме",
+                        text = if (isLoginMode) stringResource(R.string.enter_account)
+                               else stringResource(R.string.create_account_subtitle),
                         style = MaterialTheme.typography.bodyMedium,
                         textAlign = TextAlign.Center
                     )
@@ -147,8 +180,16 @@ private fun WelcomeScreenContent(
 
                     InputField(
                         value = email,
-                        onValueChange = { email = it },
+                        onValueChange = {
+                            email = it
+                            emailError = when {
+                                it.isEmpty() -> context.getString(R.string.email_cannot_be_empty)
+                                !it.contains("@") -> context.getString(R.string.invalid_email_format)
+                                else -> null
+                            }
+                        },
                         label = stringResource(R.string.email),
+                        error = emailError,
                         modifier = Modifier.fillMaxWidth()
                     )
 
@@ -156,8 +197,16 @@ private fun WelcomeScreenContent(
 
                     InputField(
                         value = password,
-                        onValueChange = { password = it },
+                        onValueChange = {
+                            password = it
+                            passwordError = when {
+                                it.isEmpty() -> context.getString(R.string.password_cannot_be_empty)
+                                it.length < 8 -> context.getString(R.string.password_must_be_at_least_8_characters)
+                                else -> null
+                            }
+                        },
                         label = stringResource(R.string.password),
+                        error = passwordError,
                         visualTransformation = PasswordVisualTransformation(),
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth()
@@ -166,11 +215,20 @@ private fun WelcomeScreenContent(
                     Spacer(modifier = Modifier.height(16.dp))
 
                     BigButton(
-                        onClick = { onTestLoginClick(email, password) },
+                        onClick = {
+                            if (isLoginMode) {
+                                onLoginClick(email, password)
+                            } else {
+                                onRegisterClick(email, password)
+                            }
+                        },
                         modifier = Modifier.fillMaxWidth(),
                         enabled = isButtonEnabled
                     ) {
-                        Text(stringResource(R.string.test_login))
+                        Text(
+                            if (isLoginMode) stringResource(R.string.sign_in)
+                            else stringResource(R.string.create_account)
+                        )
                     }
                 }
             }
@@ -182,6 +240,20 @@ private fun WelcomeScreenContent(
             Spacer(modifier = Modifier.height(16.dp))
 
             YandexSignInButton(onClick = onSignInWithYandexClick)
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            androidx.compose.material3.TextButton(
+                onClick = { isLoginMode = !isLoginMode }
+            ) {
+                Text(
+                    text = if (isLoginMode) stringResource(R.string.no_account_register)
+                           else stringResource(R.string.have_account_login),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
         }
     }
 }

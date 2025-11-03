@@ -20,6 +20,6 @@ val postsRepositoryModule = module {
 }
 
 val financesRepositoryModule = module {
-    single<GoalsRepository> { GoalsRepository(get()) }
-    single<OperationsRepository> { OperationsRepository(get()) }
+    single<GoalsRepository> { GoalsRepository(get(), get()) }
+    single<OperationsRepository> { OperationsRepository(get(), get()) }
 }

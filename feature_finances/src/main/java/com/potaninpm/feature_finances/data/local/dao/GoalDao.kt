@@ -20,6 +20,15 @@ interface GoalDao {
     @Delete
     suspend fun deleteGoal(goal: GoalEntity)
 
+    @Query("DELETE FROM goals WHERE id = :goalId")
+    suspend fun deleteGoalById(goalId: Long)
+
     @Query("SELECT * FROM goals ORDER BY id DESC")
     fun getGoals(): Flow<List<GoalEntity>>
+    
+    @Query("SELECT * FROM goals")
+    suspend fun getGoalsSnapshot(): List<GoalEntity>
+
+    @Query("DELETE FROM goals")
+    suspend fun clearAll()
 }

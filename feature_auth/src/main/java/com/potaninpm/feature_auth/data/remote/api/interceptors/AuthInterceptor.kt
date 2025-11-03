@@ -12,11 +12,16 @@ class AuthInterceptor(
         val originalRequest = chain.request().newBuilder().apply {
             header("accept", "application/json")
             header("Content-Type", "application/json")
+            // Заголовок для ngrok чтобы обойти предупреждающую страницу
+            header("ngrok-skip-browser-warning", "true")
         }.build()
 
-        if (originalRequest.url.encodedPath.startsWith("/users") ||
-            originalRequest.url.encodedPath.startsWith("/auth") &&
-            !originalRequest.url.encodedPath.startsWith("/auth/me")
+        // Публичные эндпоинты (без токена)
+        if (originalRequest.url.encodedPath.startsWith("/register") ||
+            originalRequest.url.encodedPath.startsWith("/login") ||
+            originalRequest.url.encodedPath.startsWith("/users") ||
+            (originalRequest.url.encodedPath.startsWith("/auth") &&
+            !originalRequest.url.encodedPath.startsWith("/auth/me"))
             ) {
 
             return chain.proceed(originalRequest)
@@ -29,6 +34,7 @@ class AuthInterceptor(
         val newRequest = originalRequest.newBuilder().apply {
             header("accept", "application/json")
             header("Content-Type", "application/json")
+            header("ngrok-skip-browser-warning", "true")
             token?.let {
                 header("Authorization", "Bearer $it")
             }

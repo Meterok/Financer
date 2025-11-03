@@ -30,6 +30,45 @@ class FinancesViewModel(
             .map { list -> list.map { it.toDomain() } }
             .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
+    init {
+        // Синхронизация данных с сервера при запуске
+        syncDataFromServer()
+    }
+
+    /**
+     * Загрузить данные с сервера
+     */
+    private fun syncDataFromServer() {
+        viewModelScope.launch {
+            try {
+                // Параллельная загрузка целей и операций
+                launch { 
+                    try {
+                        goalRepository.syncGoalsFromServer()
+                    } catch (e: Exception) {
+                        // Игнорируем ошибки синхронизации, используем локальные данные
+                    }
+                }
+                launch { 
+                    try {
+                        operationRepository.syncOperationsFromServer()
+                    } catch (e: Exception) {
+                        // Игнорируем ошибки синхронизации, используем локальные данные
+                    }
+                }
+            } catch (e: Exception) {
+                // Общие ошибки игнорируются
+            }
+        }
+    }
+
+    /**
+     * Принудительная синхронизация (для pull-to-refresh)
+     */
+    fun forceSync() {
+        syncDataFromServer()
+    }
+
     val totalSavings: StateFlow<Long> =
         goals.map { list -> list.sumOf { it.currentAmount } }
             .stateIn(viewModelScope, SharingStarted.Lazily, 0L)
@@ -55,20 +94,20 @@ class FinancesViewModel(
 
     fun addGoal(title: String, targetAmount: Long, currency: String, dueDate: Long?) {
         viewModelScope.launch {
-            goalRepository.addGoal(
-                GoalEntity(
-                    title = title.trim(),
-                    targetAmount = targetAmount,
-                    currency = currency,
-                    dueDate = dueDate
-                )
+            val goal = GoalEntity(
+                title = title.trim(),
+                targetAmount = targetAmount,
+                currency = currency,
+                dueDate = dueDate
             )
+            // Добавляем с синхронизацией на сервер
+            goalRepository.addGoalWithSync(goal)
         }
     }
 
     fun transferMoney(sourceGoal: GoalEntity, targetGoal: GoalEntity, amount: Long, comment: String?) {
         viewModelScope.launch {
-            operationRepository.addOperation(
+            operationRepository.addOperationWithSync(
                 OperationEntity(
                     title = sourceGoal.title + " -> " + targetGoal.title,
                     goalId = sourceGoal.id,
@@ -80,10 +119,10 @@ class FinancesViewModel(
             )
 
             val updatedSource = sourceGoal.copy(currentAmount = sourceGoal.currentAmount - amount)
-            goalRepository.updateGoal(updatedSource)
+            goalRepository.updateGoalWithSync(updatedSource)
 
             val updatedTarget = targetGoal.copy(currentAmount = targetGoal.currentAmount + amount)
-            goalRepository.updateGoal(updatedTarget)
+            goalRepository.updateGoalWithSync(updatedTarget)
         }
     }
 
@@ -91,7 +130,7 @@ class FinancesViewModel(
     fun deleteGoal(goal: GoalEntity) {
         viewModelScope.launch {
             if (goal.currentAmount > 0) {
-                operationRepository.addOperation(
+                operationRepository.addOperationWithSync(
                     OperationEntity(
                         title = goal.title,
                         goalId = goal.id,
@@ -102,7 +141,7 @@ class FinancesViewModel(
                     )
                 )
             }
-            goalRepository.deleteGoal(goal)
+            goalRepository.deleteGoalWithSync(goal.id)
         }
     }
 
@@ -112,7 +151,7 @@ class FinancesViewModel(
         comment: String?
     ) {
         viewModelScope.launch {
-            operationRepository.addOperation(
+            operationRepository.addOperationWithSync(
                 OperationEntity(
                     title = goal.title,
                     goalId = goal.id,
@@ -124,7 +163,7 @@ class FinancesViewModel(
             )
 
             val updatedGoal = goal.copy(currentAmount = goal.currentAmount + amount)
-            goalRepository.updateGoal(updatedGoal)
+            goalRepository.updateGoalWithSync(updatedGoal)
         }
     }
 
@@ -134,7 +173,7 @@ class FinancesViewModel(
         comment: String?
     ) {
         viewModelScope.launch {
-            operationRepository.addOperation(
+            operationRepository.addOperationWithSync(
                 OperationEntity(
                     title = goal.title,
                     goalId = goal.id,
@@ -146,7 +185,7 @@ class FinancesViewModel(
             )
 
             val updatedGoal = goal.copy(currentAmount = goal.currentAmount - amount)
-            goalRepository.updateGoal(updatedGoal)
+            goalRepository.updateGoalWithSync(updatedGoal)
         }
     }
 }

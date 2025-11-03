@@ -6,7 +6,6 @@
     <string name="phone_number">Phone Number</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
-    <string name="password_must_be_at_least_4_characters">Password must be at least 4 characters</string>
     <string name="password_cannot_be_empty">Password cannot be empty</string>
     <string name="invalid_data">Invalid data</string>
     <string name="smth_went_wrong">Something went wrong. Please try again later</string>

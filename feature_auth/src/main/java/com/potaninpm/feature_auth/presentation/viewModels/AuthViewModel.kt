@@ -16,8 +16,23 @@ private const val TAG = "INFOGALL"
 
 class AuthViewModel: ViewModel(), KoinComponent {
     private val authRepository: AuthRepository by inject()
-    private val _authState = MutableStateFlow<AuthState>(AuthState.Unauthorized)
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
     val authState: StateFlow<AuthState> = _authState
+
+    init {
+        checkAuthStatus()
+    }
+
+    private fun checkAuthStatus() {
+        viewModelScope.launch {
+            val token = authRepository.getToken()
+            _authState.value = if (!token.isNullOrEmpty()) {
+                AuthState.Authorized
+            } else {
+                AuthState.Unauthorized
+            }
+        }
+    }
 
     fun login(email: String, password: String) {
         viewModelScope.launch {
@@ -37,9 +52,9 @@ class AuthViewModel: ViewModel(), KoinComponent {
 
     fun signInWithYandex(token: String) {
         viewModelScope.launch {
-            _authState.value = AuthState.Loading
-            kotlinx.coroutines.delay(500)
-            _authState.value = AuthState.Authorized
+            handleAuthAction(isLoginAttempt = true) {
+                authRepository.signInWithYandex(token)
+            }
         }
     }
 
@@ -51,7 +66,20 @@ class AuthViewModel: ViewModel(), KoinComponent {
             _authState.value = if (success) AuthState.Authorized else AuthState.Error("Authentication failed", isLoginError = isLoginAttempt)
         } catch (e: Exception) {
             Log.e(TAG, "Authentication error", e)
-            _authState.value = AuthState.Error(e.message ?: "An unexpected error occurred", isLoginError = isLoginAttempt)
+            
+            val errorMessage = when {
+                e.message?.contains("422") == true || e.message?.contains("Invalid credentials") == true -> 
+                    "Неверный email или пароль"
+                e.message?.contains("409") == true || e.message?.contains("already exists") == true -> 
+                    "Пользователь с таким email уже существует"
+                e.message?.contains("404") == true -> 
+                    "Сервер недоступен"
+                e.message?.contains("timeout") == true || e.message?.contains("Unable to resolve host") == true -> 
+                    "Ошибка сети. Проверьте подключение"
+                else -> "Произошла ошибка. Попробуйте позже"
+            }
+            
+            _authState.value = AuthState.Error(errorMessage, isLoginError = isLoginAttempt)
         }
     }
 
@@ -60,15 +88,5 @@ class AuthViewModel: ViewModel(), KoinComponent {
         _authState.value = AuthState.Unauthorized
     }
 
-    fun testLogin(email: String, password: String) {
-        viewModelScope.launch {
-            _authState.value = AuthState.Loading
-            kotlinx.coroutines.delay(500)
-            if (email.isNotEmpty() && password.isNotEmpty()) {
-                _authState.value = AuthState.Authorized
-            } else {
-                _authState.value = AuthState.Error("Заполните все поля", isLoginError = true)
-            }
-        }
-    }
+
 }
