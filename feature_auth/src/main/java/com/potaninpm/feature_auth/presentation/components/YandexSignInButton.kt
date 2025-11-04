@@ -1,5 +1,9 @@
 package com.potaninpm.feature_auth.presentation.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,6 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -28,28 +34,41 @@ import com.potaninpm.feature_auth.R
 
 @Composable
 fun YandexSignInButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(48.dp)
-            .padding(horizontal = 16.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-        shape = RoundedCornerShape(16.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .clickable(onClick = onClick)
+            .background(
+                Brush.horizontalGradient(
+                    listOf(
+                        MaterialTheme.colorScheme.surface,
+                        MaterialTheme.colorScheme.secondary.copy(0.3f)
+                    )
+                )
+            )
+            .border(
+                2.dp,
+                MaterialTheme.colorScheme.onSurface.copy(0.05f),
+                RoundedCornerShape(20.dp)
+            )
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
     ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_yandex_logo),
-                contentDescription = null,
-                tint = Color.Unspecified,
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                text = stringResource(R.string.sign_in_with_yandex),
-                color = Color.White
-            )
-        }
+        Icon(
+            painter = painterResource(id = R.drawable.ic_yandex_logo),
+            contentDescription = null,
+            tint = Color.Unspecified,
+            modifier = Modifier.size(28.dp)
+        )
+
+        Spacer(modifier = Modifier.width(12.dp))
+
+        Text(
+            text = "Войти с Яндекс ID",
+            style = MaterialTheme.typography.titleMedium
+        )
     }
 }
 

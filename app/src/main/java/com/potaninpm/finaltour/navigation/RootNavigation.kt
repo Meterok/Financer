@@ -77,7 +77,7 @@ fun RootNavigation() {
                             route = RootNavDestinations.Help,
                             labelRes = R.string.help,
                             selectedIcon = ImageVector.vectorResource(id = R.drawable.help_24px_filled),
-                            unselectedIcon = ImageVector.vectorResource(id = R.drawable.help_24px_not_filled)
+                            unselectedIcon = ImageVector.vectorResource(id = R.drawable.help_24px)
                         )
                     )
                 )
@@ -125,7 +125,9 @@ fun RootNavigation() {
             composable(RootNavDestinations.Help.route) {
                 HelpScreen(
                     modifier = Modifier
-                        .padding(innerPadding)
+                        .padding(innerPadding),
+                    navController = rootNavController,
+                    authViewModel = authViewModel
                 )
             }
 
